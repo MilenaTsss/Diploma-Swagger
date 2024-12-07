@@ -15,8 +15,8 @@
         "tags": [
           "Authorization-Users"
         ],
-        "summary": "User registration.",
-        "description": "Allows to register a new user.",
+        "summary": "Register a new user.",
+        "description": "Allows a user to register by providing their name, phone number, and password. The phone number must be in the Russian format. Password must be strong - min 6 characters, must contain at least one lowercase letter, one uppercase letter, and one digit.",
         "requestBody": {
           "required": true,
           "content": {
@@ -30,11 +30,16 @@
                   },
                   "phone": {
                     "type": "string",
-                    "example": "+7 942 421 42 42"
+                    "pattern": "^7[\\d\\s\\+\\-]*[\\d]{10}$",
+                    "example": "+7 942 421 42 42",
+                    "description": "Phone number must be in Russian format, starting with '7' and followed by 10 digits."
                   },
                   "password": {
                     "type": "string",
-                    "example": "some_password"
+                    "minLength": 6,
+                    "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,}$",
+                    "example": "SecurePassword1",
+                    "description": "Password must contain at least one lowercase letter, one uppercase letter, and one digit, with a minimum length of 6 characters."
                   }
                 }
               }
@@ -59,7 +64,7 @@
             }
           },
           "400": {
-            "description": "Invalid data provided. Phone number format is incorrect."
+            "description": "Invalid data provided. Ensure the phone number is in the correct format and the password meets security requirements."
           },
           "409": {
             "description": "A user with this phone number already exists."
@@ -75,8 +80,8 @@
         "tags": [
           "Authorization-General"
         ],
-        "summary": "User login",
-        "description": "Returns an access token for API usage.",
+        "summary": "User login.",
+        "description": "Authenticates the user and returns an access token along with the user’s type (user/admin) and expiration time.",
         "requestBody": {
           "required": true,
           "content": {
@@ -90,7 +95,7 @@
                   },
                   "password": {
                     "type": "string",
-                    "example": "some_password"
+                    "example": "SomePassword"
                   }
                 }
               }
@@ -108,6 +113,10 @@
                     "access_token": {
                       "type": "string",
                       "example": "64b1c7e8-4e12-47c5-9dfd-7a6b7699c582"
+                    },
+                    "refresh_token": {
+                      "type": "string",
+                      "example": "d3a46c5a-bc3f-4e28-91b8-7cbf4799c832"
                     },
                     "expires_in": {
                       "type": "integer",
@@ -128,6 +137,9 @@
           },
           "401": {
             "description": "Invalid phone number or password."
+          },
+          "500": {
+            "description": "Internal server error. Please try again later."
           }
         }
       }
@@ -137,8 +149,8 @@
         "tags": [
           "Authorization-General"
         ],
-        "summary": "Get authenticated user data.",
-        "description": "Retrieves the profile information of the currently authenticated user based on the provided Bearer token.",
+        "summary": "Retrieve the authenticated user's profile.",
+        "description": "Returns the profile information of the currently authenticated user, based on the provided Bearer token.",
         "security": [
           {
             "BearerAuth": []
@@ -156,7 +168,10 @@
             }
           },
           "401": {
-            "description": "Unauthorized. Admin access required."
+            "description": "Unauthorized. Please provide a valid authentication token."
+          },
+          "500": {
+            "description": "Internal server error. Please try again later."
           }
         }
       }
@@ -166,8 +181,8 @@
         "tags": [
           "Authorization-General"
         ],
-        "summary": "Change password",
-        "description": "Allows an authenticated user to change their password.",
+        "summary": "Change the user's password.",
+        "description": "Allows the authenticated user to change their password by providing the current password and a new secure one.",
         "security": [
           {
             "BearerAuth": []
@@ -198,10 +213,13 @@
             "description": "Password changed successfully."
           },
           "400": {
-            "description": "Invalid current password or bad input."
+            "description": "Invalid current password or new password does not meet security standards."
           },
           "401": {
-            "description": "User is not authenticated."
+            "description": "Unauthorized. User is not authenticated."
+          },
+          "500": {
+            "description": "Internal server error. Please try again later."
           }
         }
       }
@@ -211,8 +229,8 @@
         "tags": [
           "Authorization-General"
         ],
-        "summary": "Change phone number",
-        "description": "Allows an authenticated user to update their phone number.",
+        "summary": "Change the user's phone number.",
+        "description": "Allows the authenticated user to update their phone number after verifying their current password. The phone number must be a valid phone number in Russia.",
         "security": [
           {
             "BearerAuth": []
@@ -243,10 +261,16 @@
             "description": "Phone number changed successfully."
           },
           "400": {
-            "description": "Invalid phone number format or phone already exists."
+            "description": "Invalid phone number format."
           },
           "401": {
-            "description": "User is not authenticated."
+            "description": "Unauthorized. User is not authenticated."
+          },
+          "409": {
+            "description": "A user with this phone number already exists."
+          },
+          "500": {
+            "description": "Internal server error. Please try again later."
           }
         }
       }
@@ -553,7 +577,7 @@
             "required": true,
             "schema": {
               "type": "integer",
-              "example": 1
+              "example": 42
             }
           }
         ],
@@ -595,7 +619,7 @@
             "required": true,
             "schema": {
               "type": "integer",
-              "example": 1
+              "example": 42
             }
           }
         ],
@@ -730,7 +754,7 @@
             "required": true,
             "schema": {
               "type": "integer",
-              "example": 1
+              "example": 42
             }
           }
         ],
@@ -787,7 +811,7 @@
             "required": true,
             "schema": {
               "type": "integer",
-              "example": 1
+              "example": 42
             }
           },
           {
@@ -850,11 +874,57 @@
         }
       }
     },
+    "/barriers/{barrier_id}/users/{user_id}": {
+      "delete": {
+        "tags": [
+          "Barriers-Admins"
+        ],
+        "summary": "Remove a user’s access to a specific barrier.",
+        "description": "Deletes the access of a user to a barrier, identified by the barrier's ID and user's ID. This action is restricted to the barrier’s admin.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "barrier_id",
+            "in": "path",
+            "description": "The unique ID of the barrier.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 42
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "The unique ID of the user.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 42
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deleted the user from the barrier."
+          },
+          "403": {
+            "description": "Forbidden. User does not have admin privileges for this barrier."
+          },
+          "404": {
+            "description": "Barrier not found, or user not connected to the barrier."
+          }
+        }
+      }
+    },
     "/barriers/{barrier_id}/phones": {
       "get": {
         "tags": [
-          "Barrier-Phones-Admins",
-          "Barrier-Phones-Users"
+          "Barrier-Phones-General"
         ],
         "summary": "Get all additional phones connected to a specific barrier.",
         "description": "Retrieve all additional phone numbers connected to a barrier, including their type and schedule. If admin requested - then there will be phones for all users, if user requests then only phones of this user. Also can be paginated.",
@@ -871,7 +941,7 @@
             "required": true,
             "schema": {
               "type": "integer",
-              "example": 1
+              "example": 42
             }
           },
           {
@@ -992,11 +1062,10 @@
       },
       "post": {
         "tags": [
-          "Barrier-Phones-Admins",
-          "Barrier-Phones-Users"
+          "Barrier-Phones-General"
         ],
         "summary": "Add a new additional phone to a barrier.",
-        "description": "Allows the user to add a regular, temporary, or scheduled phone number to a barrier.",
+        "description": "Allows the user to add a regular, temporary, or scheduled phone number to a barrier. Admin also can do that, but it means that he adds phone for some other user.",
         "security": [
           {
             "BearerAuth": []
@@ -1020,6 +1089,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "user_id": {
+                    "type": "integer",
+                    "example": 42
+                  },
                   "phone": {
                     "type": "string",
                     "example": "+7 942 421 42 42"
@@ -1088,8 +1161,7 @@
     "/barriers/{barrier_id}/phones/{phone_id}": {
       "patch": {
         "tags": [
-          "Barrier-Phones-Admins",
-          "Barrier-Phones-Users"
+          "Barrier-Phones-General"
         ],
         "summary": "Edit an existing additional phone.",
         "description": "Allows the user to update the details of an existing phone number (e.g., change schedule or name).",
@@ -1181,8 +1253,7 @@
       },
       "delete": {
         "tags": [
-          "Barrier-Phones-Admins",
-          "Barrier-Phones-Users"
+          "Barrier-Phones-General"
         ],
         "summary": "Delete an additional phone from a barrier.",
         "description": "Allows the user to delete an additional phone number associated with a barrier.",
