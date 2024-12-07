@@ -1,0 +1,1090 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Platform for Remote Control of a Barrier Access Control System",
+    "description": "This is a specification for this barrier access control system.",
+    "version": "0.1.0"
+  },
+  "externalDocs": {
+    "description": "Database diagram",
+    "url": "https://dbdiagram.io/d/Diploma-DB-673e9c25e9daa85aca2ed394"
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "Authorization-Users"
+        ],
+        "summary": "User registration.",
+        "description": "Allows to register a new user.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "full_name": {
+                    "type": "string",
+                    "example": "Ivan Ivanov"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": "+7 942 421 42 42"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "some_password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User successfully registered.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "example": "64b1c7e8-4e12-47c5-9dfd-7a6b7699c582"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid data provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Phone number format is incorrect."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "User already exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "A user with this phone number already exists."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error. Please try again later."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Authorization-General"
+        ],
+        "summary": "User login",
+        "description": "Returns an access token for API usage.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phone": {
+                    "type": "string",
+                    "example": "+7 942 421 42 42"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "some_password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful authentication.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string",
+                      "example": "64b1c7e8-4e12-47c5-9dfd-7a6b7699c582"
+                    },
+                    "expires_in": {
+                      "type": "integer",
+                      "example": 3600
+                    },
+                    "user_type": {
+                      "type": "string",
+                      "example": "admin"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid login credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid phone number or password."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/change-password": {
+      "patch": {
+        "tags": [
+          "Authorization-General"
+        ],
+        "summary": "Change password",
+        "description": "Allows an authenticated user to change their password.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "current_password": {
+                    "type": "string",
+                    "example": "old_password"
+                  },
+                  "new_password": {
+                    "type": "string",
+                    "example": "new_secure_password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed successfully."
+          },
+          "400": {
+            "description": "Invalid current password or bad input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "The current password is incorrect."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "User is not authenticated."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/change-phone": {
+      "patch": {
+        "tags": [
+          "Authorization-General"
+        ],
+        "summary": "Change phone number",
+        "description": "Allows an authenticated user to update their phone number.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "new_phone": {
+                    "type": "string",
+                    "example": "+7 942 421 42 42"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "current_password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Phone number changed successfully."
+          },
+          "400": {
+            "description": "Invalid phone number format or phone already exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "The provided phone number is already in use."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "User is not authenticated."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/barriers": {
+      "get": {
+        "tags": [
+          "Barriers-General"
+        ],
+        "summary": "Get a list of all barriers.",
+        "description": "Returns a list of barriers with optional search by address and pagination.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "street_address",
+            "in": "query",
+            "description": "Search for barriers by part of the street address (substring match).",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "Красная площадь"
+            }
+          },
+          {
+            "name": "latitude",
+            "in": "query",
+            "description": "Latitude of the geographic location to search nearby barriers.",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "float",
+              "example": 55.7558
+            }
+          },
+          {
+            "name": "longitude",
+            "in": "query",
+            "description": "Longitude of the geographic location to search nearby barriers.",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "float",
+              "example": 37.6176
+            }
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "Radius (in meters) for proximity search when using latitude and longitude.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1000,
+              "example": 5000
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "example": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Number of items per page.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of barriers with pagination and optional address search.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total_count": {
+                      "type": "integer",
+                      "example": 100
+                    },
+                    "current_page": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "page_size": {
+                      "type": "integer",
+                      "example": 10
+                    },
+                    "barriers": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Barrier"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid parameters."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Barriers-Admins"
+        ],
+        "summary": "Create a new barrier.",
+        "description": "Allows an admin to create a new barrier with all required and optional settings.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "address": {
+                    "type": "string",
+                    "description": "The address of the barrier for map display.",
+                    "example": "Main St, Apt 101, Moscow"
+                  },
+                  "device_phone_number": {
+                    "type": "string",
+                    "description": "The phone number used to control the barrier.",
+                    "example": "+7 942 421 42 42"
+                  },
+                  "device_model": {
+                    "type": "string",
+                    "enum": [
+                      "rtu5024",
+                      "rtu5025",
+                      "rtu5035"
+                    ],
+                    "description": "The type of the device controlling the barrier.",
+                    "example": "rtu5025"
+                  },
+                  "contact_phone": {
+                    "type": "string",
+                    "description": "Contact phone number for user inquiries.",
+                    "example": "+7 942 421 42 42"
+                  },
+                  "limits": {
+                    "type": "array",
+                    "description": "List of limits for the barrier.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "limit_type": {
+                          "type": "string",
+                          "enum": [
+                            "phone",
+                            "temporary",
+                            "sms"
+                          ],
+                          "description": "The type of limit.",
+                          "example": "phone"
+                        },
+                        "limit_value": {
+                          "type": "integer",
+                          "description": "The value for this limit.",
+                          "example": 10
+                        }
+                      }
+                    }
+                  },
+                  "is_public": {
+                    "type": "boolean",
+                    "description": "Whether the barrier is visible to all users.",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Barrier created successfully."
+          },
+          "400": {
+            "description": "Invalid input data."
+          },
+          "401": {
+            "description": "Unauthorized. Admin access required."
+          },
+          "500": {
+            "description": "Server error."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/barriers/my": {
+      "get": {
+        "tags": [
+          "Barriers-General"
+        ],
+        "summary": "Get a list of my barriers.",
+        "description": "Returns a list of barriers with optional pagination.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "example": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Number of items per page.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of barriers with pagination.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total_count": {
+                      "type": "integer",
+                      "example": 100
+                    },
+                    "current_page": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "page_size": {
+                      "type": "integer",
+                      "example": 10
+                    },
+                    "barriers": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Barrier"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid parameters."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/barriers/{barrier_id}": {
+      "get": {
+        "tags": [
+          "Barriers-General"
+        ],
+        "summary": "Get detailed information about a barrier.",
+        "description": "Retrieves detailed information about a barrier by its unique ID.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "barrier_id",
+            "in": "path",
+            "description": "The unique ID of the barrier.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Details about the barrier.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Barrier"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid barrier ID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid barrier ID."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Barrier not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Barrier not found."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Barriers-General"
+        ],
+        "summary": "Delete a barrier.",
+        "description": "Allows admins to delete a barrier completely. Users can only remove the barrier from their list (leave the group).",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "barrier_id",
+            "in": "path",
+            "description": "The unique ID of the barrier.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deleted the barrier or removed it from the user's list."
+          },
+          "404": {
+            "description": "Barrier not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Barrier not found."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 42
+          },
+          "phone": {
+            "type": "string",
+            "format": "phone",
+            "example": "+7 942 421 42 42"
+          },
+          "full_name": {
+            "type": "string",
+            "example": "Ivanov Ivan"
+          },
+          "password": {
+            "type": "string",
+            "example": "encoded_password"
+          },
+          "is_admin": {
+            "type": "boolean",
+            "default": false
+          },
+          "is_active": {
+            "type": "boolean",
+            "default": true
+          },
+          "date_joined": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-12-07T10:00:00Z"
+          },
+          "last_login": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-12-07T15:30:00Z"
+          }
+        },
+        "xml": {
+          "name": "user"
+        }
+      },
+      "Barrier": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 42
+          },
+          "owner_id": {
+            "type": "integer",
+            "example": 42
+          },
+          "address_id": {
+            "type": "integer",
+            "example": 42
+          },
+          "device_phone_number": {
+            "type": "string",
+            "example": "+7 942 421 42 42"
+          },
+          "device_model": {
+            "type": "string",
+            "enum": [
+              "rtu5024",
+              "rtu5025"
+            ],
+            "example": "rtu5035"
+          },
+          "metadata": {
+            "type": "string",
+            "example": "{\"key\": \"value\"}"
+          },
+          "is_public": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 42
+          },
+          "street_address": {
+            "type": "string",
+            "example": "Красная площадь, 1"
+          },
+          "city": {
+            "type": "string",
+            "example": "Москва"
+          },
+          "state": {
+            "type": "string",
+            "example": "Москва"
+          },
+          "postal_code": {
+            "type": "string",
+            "example": 109012
+          },
+          "country": {
+            "type": "string",
+            "example": "Россия"
+          },
+          "latitude": {
+            "type": "number",
+            "example": 55.7558
+          },
+          "longitude": {
+            "type": "number",
+            "example": 37.6176
+          }
+        }
+      },
+      "BarrierLimits": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 42
+          },
+          "barrier_id": {
+            "type": "integer",
+            "example": 42
+          },
+          "limit_type": {
+            "type": "string",
+            "enum": [
+              "phone",
+              "temporary",
+              "sms"
+            ],
+            "example": "phone"
+          },
+          "limit_value": {
+            "type": "integer",
+            "example": 100
+          }
+        }
+      },
+      "AdditionalPhone": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 42
+          },
+          "user_id": {
+            "type": "integer",
+            "example": 42
+          },
+          "barrier_id": {
+            "type": "integer",
+            "example": 42
+          },
+          "phone": {
+            "type": "string",
+            "example": "+7 942 421 42 42"
+          },
+          "name": {
+            "type": "string",
+            "example": "Guest: Ivanov Ivan"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "static",
+              "temporary",
+              "schedule"
+            ],
+            "example": "temporary"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2024-12-01T10:00:00Z"
+          },
+          "end_time": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2024-12-02T10:00:00Z"
+          }
+        }
+      },
+      "PhoneSchedule": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 42
+          },
+          "phone_id": {
+            "type": "integer",
+            "example": 42
+          },
+          "day_of_week": {
+            "type": "string",
+            "enum": [
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday",
+              "sunday"
+            ],
+            "example": "monday"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "time",
+            "example": "09:00:00"
+          },
+          "end_time": {
+            "type": "string",
+            "format": "time",
+            "example": "18:00:00"
+          }
+        }
+      },
+      "EnterRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 42
+          },
+          "user_id": {
+            "type": "integer",
+            "example": 42
+          },
+          "barrier_id": {
+            "type": "integer",
+            "example": 42
+          },
+          "is_active": {
+            "type": "boolean",
+            "example": true
+          },
+          "is_accepted": {
+            "type": "boolean",
+            "nullable": true,
+            "example": true
+          },
+          "request_type": {
+            "type": "string",
+            "enum": [
+              "from_user",
+              "from_barrier"
+            ],
+            "example": "from_user"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-12-01T10:00:00Z"
+          }
+        }
+      },
+      "ActionHistory": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 42
+          },
+          "user_id": {
+            "type": "integer",
+            "example": 42
+          },
+          "action_type": {
+            "type": "string",
+            "enum": [
+              "add_phone",
+              "delete_phone",
+              "set_time_restrictions"
+            ],
+            "example": "add_phone"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-12-01T10:00:00Z"
+          }
+        }
+      },
+      "SmsLog": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 42
+          },
+          "phone": {
+            "type": "string",
+            "example": "+7 942 421 42 42"
+          },
+          "message": {
+            "type": "string",
+            "example": "Command sent to open barrier"
+          },
+          "sent_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-12-01T10:00:00Z"
+          }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "xml": {
+          "name": "##default"
+        }
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}
