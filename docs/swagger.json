@@ -132,6 +132,35 @@
         }
       }
     },
+    "/auth/user": {
+      "get": {
+        "tags": [
+          "Authorization-General"
+        ],
+        "summary": "Get authenticated user data.",
+        "description": "Retrieves the profile information of the currently authenticated user based on the provided Bearer token.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Admin access required."
+          }
+        }
+      }
+    },
     "/auth/change-password": {
       "patch": {
         "tags": [
@@ -824,8 +853,8 @@
     "/barriers/{barrier_id}/phones": {
       "get": {
         "tags": [
-          "Barriers-Admins",
-          "Barriers-Users"
+          "Barrier-Phones-Admins",
+          "Barrier-Phones-Users"
         ],
         "summary": "Get all additional phones connected to a specific barrier.",
         "description": "Retrieve all additional phone numbers connected to a barrier, including their type and schedule. If admin requested - then there will be phones for all users, if user requests then only phones of this user. Also can be paginated.",
@@ -963,8 +992,8 @@
       },
       "post": {
         "tags": [
-          "Barriers-Admins",
-          "Barriers-Users"
+          "Barrier-Phones-Admins",
+          "Barrier-Phones-Users"
         ],
         "summary": "Add a new additional phone to a barrier.",
         "description": "Allows the user to add a regular, temporary, or scheduled phone number to a barrier.",
@@ -1059,11 +1088,16 @@
     "/barriers/{barrier_id}/phones/{phone_id}": {
       "patch": {
         "tags": [
-          "Barriers-Admins",
-          "Barriers-Users"
+          "Barrier-Phones-Admins",
+          "Barrier-Phones-Users"
         ],
         "summary": "Edit an existing additional phone.",
         "description": "Allows the user to update the details of an existing phone number (e.g., change schedule or name).",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "barrier_id",
@@ -1147,11 +1181,16 @@
       },
       "delete": {
         "tags": [
-          "Barriers-Admins",
-          "Barriers-Users"
+          "Barrier-Phones-Admins",
+          "Barrier-Phones-Users"
         ],
         "summary": "Delete an additional phone from a barrier.",
         "description": "Allows the user to delete an additional phone number associated with a barrier.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "barrier_id",
