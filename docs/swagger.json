@@ -59,52 +59,13 @@
             }
           },
           "400": {
-            "description": "Invalid data provided.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Phone number format is incorrect."
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Invalid data provided. Phone number format is incorrect."
           },
           "409": {
-            "description": "User already exists.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "A user with this phone number already exists."
-                    }
-                  }
-                }
-              }
-            }
+            "description": "A user with this phone number already exists."
           },
           "500": {
-            "description": "Server error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Internal server error. Please try again later."
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Internal server error. Please try again later."
           }
         }
       }
@@ -154,6 +115,10 @@
                     },
                     "user_type": {
                       "type": "string",
+                      "enum": [
+                        "user",
+                        "admin"
+                      ],
                       "example": "admin"
                     }
                   }
@@ -162,20 +127,7 @@
             }
           },
           "401": {
-            "description": "Invalid login credentials.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Invalid phone number or password."
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Invalid phone number or password."
           }
         }
       }
@@ -217,36 +169,10 @@
             "description": "Password changed successfully."
           },
           "400": {
-            "description": "Invalid current password or bad input.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "The current password is incorrect."
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Invalid current password or bad input."
           },
           "401": {
-            "description": "Unauthorized.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "User is not authenticated."
-                    }
-                  }
-                }
-              }
-            }
+            "description": "User is not authenticated."
           }
         }
       }
@@ -288,36 +214,10 @@
             "description": "Phone number changed successfully."
           },
           "400": {
-            "description": "Invalid phone number format or phone already exists.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "The provided phone number is already in use."
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Invalid phone number format or phone already exists."
           },
           "401": {
-            "description": "Unauthorized.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "User is not authenticated."
-                    }
-                  }
-                }
-              }
-            }
+            "description": "User is not authenticated."
           }
         }
       }
@@ -433,20 +333,7 @@
             }
           },
           "400": {
-            "description": "Invalid parameters.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Invalid parameters."
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Invalid parameters."
           }
         }
       },
@@ -456,6 +343,11 @@
         ],
         "summary": "Create a new barrier.",
         "description": "Allows an admin to create a new barrier with all required and optional settings.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -477,8 +369,7 @@
                     "type": "string",
                     "enum": [
                       "rtu5024",
-                      "rtu5025",
-                      "rtu5035"
+                      "rtu5025"
                     ],
                     "description": "The type of the device controlling the barrier.",
                     "example": "rtu5025"
@@ -487,6 +378,11 @@
                     "type": "string",
                     "description": "Contact phone number for user inquiries.",
                     "example": "+7 942 421 42 42"
+                  },
+                  "metadata": {
+                    "type": "string",
+                    "description": "Some description about device.",
+                    "example": "You need to call me before opening."
                   },
                   "limits": {
                     "type": "array",
@@ -527,20 +423,12 @@
             "description": "Barrier created successfully."
           },
           "400": {
-            "description": "Invalid input data."
+            "description": "Invalid data provided."
           },
           "401": {
             "description": "Unauthorized. Admin access required."
-          },
-          "500": {
-            "description": "Server error."
           }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+        }
       }
     },
     "/barriers/my": {
@@ -611,20 +499,7 @@
             }
           },
           "400": {
-            "description": "Invalid parameters.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Invalid parameters."
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Invalid parameters."
           }
         }
       }
@@ -665,36 +540,10 @@
             }
           },
           "400": {
-            "description": "Invalid barrier ID.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Invalid barrier ID."
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Invalid barrier ID."
           },
           "404": {
-            "description": "Barrier not found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Barrier not found."
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Barrier not found."
           }
         }
       },
@@ -726,20 +575,609 @@
             "description": "Successfully deleted the barrier or removed it from the user's list."
           },
           "404": {
-            "description": "Barrier not found.",
+            "description": "Barrier not found."
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Barriers-Admins"
+        ],
+        "summary": "Edit an existing barrier.",
+        "description": "Update specific details of a barrier by its ID.",
+        "parameters": [
+          {
+            "name": "barrier_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the barrier to be updated."
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "address": {
+                    "type": "string",
+                    "example": "Updated St, Apt 202, Moscow"
+                  },
+                  "device_phone_number": {
+                    "type": "string",
+                    "description": "The phone number used to control the barrier.",
+                    "example": "+7 942 421 42 42"
+                  },
+                  "device_model": {
+                    "type": "string",
+                    "enum": [
+                      "rtu5024",
+                      "rtu5025"
+                    ],
+                    "description": "The type of the device controlling the barrier.",
+                    "example": "rtu5024"
+                  },
+                  "contact_phone": {
+                    "type": "string",
+                    "description": "Contact phone number for user inquiries.",
+                    "example": "+7 942 421 42 42"
+                  },
+                  "metadata": {
+                    "type": "string",
+                    "description": "Some description about device.",
+                    "example": "You need to call me before opening."
+                  },
+                  "limits": {
+                    "type": "array",
+                    "description": "List of limits for the barrier.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "limit_type": {
+                          "type": "string",
+                          "enum": [
+                            "phone",
+                            "temporary",
+                            "sms"
+                          ],
+                          "description": "The type of limit.",
+                          "example": "phone"
+                        },
+                        "limit_value": {
+                          "type": "integer",
+                          "description": "The value for this limit.",
+                          "example": 10
+                        }
+                      }
+                    }
+                  },
+                  "is_public": {
+                    "type": "boolean",
+                    "example": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Barrier successfully updated."
+          },
+          "400": {
+            "description": "Invalid input."
+          },
+          "404": {
+            "description": "Barrier not found."
+          }
+        }
+      }
+    },
+    "/barriers/{barrier_id}/settings": {
+      "patch": {
+        "tags": [
+          "Barriers-Admins"
+        ],
+        "summary": "Update specific settings for a barrier.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "barrier_id",
+            "in": "path",
+            "description": "ID of the barrier to update.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "setting_key": {
+                    "type": "string",
+                    "example": "opening_duration"
+                  },
+                  "setting_value": {
+                    "type": "string",
+                    "example": "15"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Barrier settings updated successfully."
+          },
+          "400": {
+            "description": "Invalid input data."
+          },
+          "404": {
+            "description": "Barrier or setting not found."
+          }
+        }
+      }
+    },
+    "/barriers/{barrier_id}/users": {
+      "get": {
+        "tags": [
+          "Barriers-Admins"
+        ],
+        "summary": "Get all users connected to a specific barrier.",
+        "description": "Fetch all users who have access to a specific barrier, based on the barrier's ID.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "barrier_id",
+            "in": "path",
+            "description": "The unique ID of the barrier.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "example": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Number of items per page.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of users connected to the barrier.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Barrier not found."
+                    "total_count": {
+                      "type": "integer",
+                      "example": 100
+                    },
+                    "current_page": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "page_size": {
+                      "type": "integer",
+                      "example": 10
+                    },
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      }
                     }
                   }
                 }
               }
             }
+          },
+          "404": {
+            "description": "Barrier not found."
+          }
+        }
+      }
+    },
+    "/barriers/{barrier_id}/phones": {
+      "get": {
+        "tags": [
+          "Barriers-Admins",
+          "Barriers-Users"
+        ],
+        "summary": "Get all additional phones connected to a specific barrier.",
+        "description": "Retrieve all additional phone numbers connected to a barrier, including their type and schedule. If admin requested - then there will be phones for all users, if user requests then only phones of this user. Also can be paginated.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "barrier_id",
+            "in": "path",
+            "description": "The unique ID of the barrier.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "example": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Number of items per page.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of additional phones connected to the barrier.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total_count": {
+                      "type": "integer",
+                      "example": 100
+                    },
+                    "current_page": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "page_size": {
+                      "type": "integer",
+                      "example": 10
+                    },
+                    "phones": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "phone_id": {
+                            "type": "integer",
+                            "example": 42
+                          },
+                          "user_id": {
+                            "type": "integer",
+                            "example": 42
+                          },
+                          "barrier_id": {
+                            "type": "integer",
+                            "example": 42
+                          },
+                          "phone": {
+                            "type": "string",
+                            "example": "+7 942 421 42 42"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "static",
+                              "temporary",
+                              "schedule"
+                            ],
+                            "example": "schedule"
+                          },
+                          "start_time": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": null
+                          },
+                          "end_time": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": null
+                          },
+                          "schedule": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "day_of_week": {
+                                  "type": "integer",
+                                  "example": 1
+                                },
+                                "start_time": {
+                                  "type": "string",
+                                  "example": "09:00"
+                                },
+                                "end_time": {
+                                  "type": "string",
+                                  "example": "18:00"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Barrier not found."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Barriers-Admins",
+          "Barriers-Users"
+        ],
+        "summary": "Add a new additional phone to a barrier.",
+        "description": "Allows the user to add a regular, temporary, or scheduled phone number to a barrier.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "barrier_id",
+            "in": "path",
+            "description": "ID of the barrier.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phone": {
+                    "type": "string",
+                    "example": "+7 942 421 42 42"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Guest Number"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "static",
+                      "temporary",
+                      "schedule"
+                    ],
+                    "example": "schedule"
+                  },
+                  "start_time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2024-12-01T10:00:00"
+                  },
+                  "end_time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2024-12-01T18:00:00"
+                  },
+                  "schedule": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "day_of_week": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "start_time": {
+                          "type": "string",
+                          "example": "09:00"
+                        },
+                        "end_time": {
+                          "type": "string",
+                          "example": "18:00"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Phone added successfully."
+          },
+          "400": {
+            "description": "Invalid input data."
+          },
+          "401": {
+            "description": "Unauthorized."
+          }
+        }
+      }
+    },
+    "/barriers/{barrier_id}/phones/{phone_id}": {
+      "patch": {
+        "tags": [
+          "Barriers-Admins",
+          "Barriers-Users"
+        ],
+        "summary": "Edit an existing additional phone.",
+        "description": "Allows the user to update the details of an existing phone number (e.g., change schedule or name).",
+        "parameters": [
+          {
+            "name": "barrier_id",
+            "in": "path",
+            "description": "ID of the barrier.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "phone_id",
+            "in": "path",
+            "description": "ID of the phone number to update.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phone": {
+                    "type": "string",
+                    "example": "+7 942 421 42 42"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Updated Guest Number"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "static",
+                      "temporary",
+                      "schedule"
+                    ],
+                    "example": "schedule"
+                  },
+                  "schedule": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "day_of_week": {
+                          "type": "integer",
+                          "example": 2
+                        },
+                        "start_time": {
+                          "type": "string",
+                          "example": "10:00"
+                        },
+                        "end_time": {
+                          "type": "string",
+                          "example": "16:00"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Phone updated successfully."
+          },
+          "400": {
+            "description": "Invalid input data."
+          },
+          "404": {
+            "description": "Phone not found."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Barriers-Admins",
+          "Barriers-Users"
+        ],
+        "summary": "Delete an additional phone from a barrier.",
+        "description": "Allows the user to delete an additional phone number associated with a barrier.",
+        "parameters": [
+          {
+            "name": "barrier_id",
+            "in": "path",
+            "description": "ID of the barrier.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "phone_id",
+            "in": "path",
+            "description": "ID of the phone number.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Phone deleted successfully."
+          },
+          "404": {
+            "description": "Phone not found."
           }
         }
       }
@@ -810,13 +1248,9 @@
             "type": "string",
             "example": "+7 942 421 42 42"
           },
-          "device_model": {
-            "type": "string",
-            "enum": [
-              "rtu5024",
-              "rtu5025"
-            ],
-            "example": "rtu5035"
+          "device_model_id": {
+            "type": "integer",
+            "example": 42
           },
           "metadata": {
             "type": "string",
@@ -888,6 +1322,40 @@
           "limit_value": {
             "type": "integer",
             "example": 100
+          }
+        }
+      },
+      "DeviceModels": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 42
+          },
+          "model_name": {
+            "type": "string",
+            "example": "rtu5025"
+          }
+        }
+      },
+      "DeviceModelSettings": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 42
+          },
+          "device_model_id": {
+            "type": "integer",
+            "example": 42
+          },
+          "setting_key": {
+            "type": "string",
+            "example": "opening_duration"
+          },
+          "description": {
+            "type": "string",
+            "example": "This is some setting to set opening duration"
           }
         }
       },
